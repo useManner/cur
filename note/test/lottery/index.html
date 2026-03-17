@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="gbk">
+    <meta http-equiv="x-ua-compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="format-detection" content="telephone=no" />
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta name="author" content="Design:CP; Web Layout:CP;" />
+    <meta name="robots" content="all" />
+    <meta name="Description" content="" />
+    <meta name="Keywords" content="" />
+    <title>抽奖组件</title>
+    <style>
+        /*css reset START*/
+        body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+            margin: 0;    padding: 0;
+        }
+        article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {    display: block;}
+        html {position: relative;width: 100%;height: 100%;font-size: 100px;}
+        body {
+            background: black;font: .22rem/1.75 -apple-system, "source", "Helvetica Neue", Helvetica, Arial, sans-serif;font-size: 0.24rem;position: relative;width: 100%;height: 100%;}
+        table {border-collapse: collapse;border-spacing: 0;}
+        audio, canvas, video {display: inline-block;*display: inline;*zoom: 1;}
+        fieldset, img {border: 0;}
+        b {font-weight: normal;}
+        img {vertical-align: top;/*-webkit-touch-callout: none;*/user-select: none;}
+        address, caption, cite, code, dfn, em, strong, th, var {font-style: normal;font-weight: normal;}
+        ol, ul {list-style: none;}
+        caption, th {text-align: left;}
+        h1, h2, h3, h4, h5, h6 {font-size: 100%;font-weight: normal;}
+        q:before, q:after {content: '';}
+        abbr, acronym {border: 0;font-variant: normal;}
+        sup {vertical-align: text-top;}
+        sub {vertical-align: text-bottom;}
+        input, textarea, select {font-family: inherit;font-size: inherit;font-weight: inherit;*font-size: 100%;}
+        .clear:after {content: " ";clear: both;height: 0;visibility: hidden;display: block;}
+        .clear {*zoom: 1;}
+        :focus {outline: 0;}
+        a, a:active {-webkit-tap-highlight-color: rgba(255, 255, 255, 0);-webkit-user-select: none;user-select: none;text-decoration: none;}
+        .hide {width: 0; height: 0;overflow: hidden;display: none !important;}
+        .t {display: block;overflow: hidden; text-indent: -9999px;font-size: 0;}
+        .pr {position: relative;}
+        .pa {position: absolute;}
+        .pf {position: fixed;}
+        .flex {display: flex;display: -webkit-flex;}
+        .flex-1 {flex: 1; -webkit-flex: 1;}
+        .flex-center {justify-content: center;-webkit-justify-content: center;}
+        .flex-middle {align-items: center;}
+        .flex-between {justify-content: space-between;-webkit-justify-content: space-between;}
+        .flex-cm {display: flex;display: -webkit-flex;justify-content: center;-webkit-justify-content: center;align-items: center;}
+        .t-c {text-align: center;}
+        .t-l {text-align: left;}
+        .t-r {text-align: right;}
+        .t-18{font-size: 18px;}
+        .bg {background-repeat: no-repeat; background-position: 0 0; background-size: 100% auto;}
+        .bg-full {background-size: 100% 100%;}
+        .full-img img {width: 100%;display: block;}
+        input[type=tel]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {appearance: none;-webkit-appearance: none;-moz-appearance: textfield;}
+        .btn_click {pointer-events: auto;}
+
+
+        /* page css start*/
+
+
+
+        .lottery_box ul{
+            width: 100%;
+            height: 5.46rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+        }
+
+        .lottery_item{
+            width: 1.7rem;
+            height: 1.7rem;
+            background: saddlebrown;
+        }
+
+        .btn_lottery{
+            background: red;
+            width: 1.7rem;
+            height: 1.7rem;
+        }
+
+        .btn_lottery.ing{
+            background: hotpink;
+        }
+
+        .lottery_item.curr{
+            background: darkcyan;
+        }
+    </style>
+</head>
+<!-- 页面设计：cp | 页面制作：cp | 创建：2025-11-21 -->
+
+<body>
+<div class="warp">
+    <!-- 页面标题 -->
+    <h1 class="hide">抽奖组件</h1>
+    <!-- 主体内容 -->
+    <div class="main">
+                <!-- 抽奖模块-->
+                <div class="lottery_box">
+                    <ul>
+                        <li data-lottery="0" class="lottery_item">
+                            0
+                        </li>
+                        <li data-lottery="1" class="lottery_item">
+                            1
+                        </li>
+                        <li data-lottery="2" class="lottery_item">
+                            2
+                        </li>
+
+                        <li data-lottery="7" class="lottery_item">
+                           7
+                        </li>
+                        <!-- 抽奖按钮 -->
+                        <li class="lottery_start">
+                            <a href="javascript:" class="btn_lottery bg t" onclick="startLottery()">开始抽奖</a>
+                        </li>
+
+                        <li data-lottery="3" class="lottery_item">
+3
+                        </li>
+                        <li data-lottery="6" class="lottery_item">
+                            6
+                        </li>
+                        <li data-lottery="5" class="lottery_item">
+                            5
+                        </li>
+                        <li data-lottery="4" class="lottery_item">
+                            4
+                        </li>
+                    </ul>
+                </div>
+        </div>
+</div>
+</body>
+<script type="text/javascript" src="//ossweb-img.qq.com/images/js/jquery/jquery-1.11.3.min.js"></script>
+<script>
+
+    const award_list = [
+        {
+            id: 0,
+            name: '贝尔签名球衣x1',
+            img: '1.png'
+        },
+        {
+            id: 1,
+            name: '143混合球员x1',
+            img: '2.png'
+        },
+        {
+            id: 2,
+            name: '142混合球员x1',
+            img: '3.png'
+        },
+        {
+            id: 3,
+            name: '139混合球员x1',
+            img: '4.png'
+        },
+        {
+            id: 4,
+            name: '谢谢参与',
+            img: '5.png'
+        },
+        {
+            id: 5,
+            name: '随机高级转移点券x5',
+            img: '8.png'
+        },
+        {
+            id: 6,
+            name: '随机高级转移点券x10',
+            img: '8.png'
+        },
+        {
+            id: 7,
+            name: '140混合球员x1',
+            img: '7.png'
+        },
+    ]
+
+    //抽奖
+    //e:中奖序号，必填
+    //{ index:初始序号(默认0),css:高亮样式名(默认curr),complete:抽奖完成回调 }，选填
+    var lotteryStart = function (e, config) {
+        var opt = $.extend({
+                index: 0,//初始序号
+                css: 'curr',//高亮样式名
+                complete: function () {
+                    //to do
+                }
+            }, config),
+            item = $('[data-lottery]'),
+            parent = item.parent(),
+            speedS = 40,
+            speedE = 360,
+            loop = 6,
+            past = 0,
+            state = function (s) {
+                if (s) parent.attr('data-state', s);
+                return parent.attr('data-state');
+            },
+            git = function (e) {
+                for (var i = 0; i < item.length; i++) {
+                    if (item.eq(i).attr('data-lottery') == e)
+                        return item.eq(i);
+                }
+            },
+            run = function () {
+                item.removeClass(opt.css);
+                git(opt.index).addClass(opt.css);
+                if (past == loop && e == opt.index) {
+                    state('结束');
+                    opt.complete(opt.index);
+                } else {
+                    setTimeout(run, speedS + Math.pow(past / loop, 2) * (speedE - speedS));
+                }
+                opt.index++;
+                if (opt.index >= item.length) {
+                    past++;
+                    opt.index = 0;
+                }
+            };
+        if (state() == '运行') return;
+        state('运行');
+        run();
+    };
+
+    /*
+    *  开始抽奖
+    *
+    * */
+    function startLottery() {
+        $('.btn_lottery').addClass('ing')
+        lotteryStart(6, {
+            index: 0,//初始4
+            complete: function (e) {
+                setTimeout(function () {
+                    alert(award_list[e].name)
+                }, 400);
+            }
+        });
+    }
+</script>
+
+</html>

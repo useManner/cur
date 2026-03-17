@@ -1,0 +1,29 @@
+{
+  "server": {
+    "port": 5000,
+    "maxFileSize": 100,
+    "tempDir": "./temp",
+    "allowedImageTypes": ["image/jpeg", "image/png", "image/gif", "image/webp"],
+    "allowedVideoTypes": ["video/mp4", "video/avi", "video/mov", "video/mkv"]
+  },
+  "detection": {
+    "defaultSimilarityThreshold": 0.8,
+    "defaultFrameSampleRate": 10,
+    "maxConcurrentProcesses": 4,
+    "cacheEnabled": true,
+    "cacheExpiryHours": 24
+  },
+  "storage": {
+    "type": "file",
+    "path": "./storage",
+    "database": {
+      "type": "none",
+      "connectionString": ""
+    }
+  },
+  "logging": {
+    "level": "info",
+    "file": "app.log",
+    "maxSize": 10
+  }
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+
+<script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// BFC 的触发条件
+// 满足以下条件之一的元素会触发 BFC：
+
+// 根元素（<html>）
+// 浮动元素（float 值不为 none）
+// 绝对定位元素（position 为 absolute 或 fixed）
+// 行内块元素（display 为 inline-block）
+// 表格单元格（display 为 table-cell）
+// 表格标题（display 为 table-caption）
+// 匿名表格单元格元素（display 为 table、table-row、table-row-group、table-header-group、table-footer-group等）
+// overflow 值不为 visible 的块元素
+// display 为 flow-root 的元素
+// contain 值为 layout、content 或 paint 的元素
+// BFC 的特性
+// BFC 内部的块级元素会在垂直方向上一个接一个地排列
+// 同一 BFC 内相邻块级元素之间的外边距会发生重叠
+// BFC 内部的元素不会与外部的浮动元素重叠
+// BFC 可以包含浮动元素，清除浮动的影响
+// 计算 BFC 的高度时，浮动元素也会参与计算
+// BFC 的应用场景
+// 清除浮动：通过给父元素触发 BFC，可以包含浮动的子元素，避免父元素高度塌陷
+// 防止外边距重叠：将两个元素放在不同的 BFC 中，可以防止它们的外边距发生重叠
+// 避免元素被浮动元素覆盖：给被覆盖的元素触发 BFC，可以使其不被浮动元素覆盖
+// 例如，清除浮动的常见做法：
+// .parent {
+//   overflow: hidden; /* 触发 BFC */
+// }
+// .child {
+//   float: left;
+// }
+
+
+// BFC 解决外边距重叠的具体实现方法
+
+// 当两个相邻的块级元素相遇时，它们的垂直外边距会发生重叠（取较大值）。通过将它们放在不同的 BFC 中，可以避免这种重叠现象。以下是具体实现方法：
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</html>

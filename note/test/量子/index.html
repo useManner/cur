@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>量子手势照片墙</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<video id="webcamVideo" style="display:none;" autoplay playsinline></video>
+<canvas id="gestureCanvas" style="position: absolute; top: 0; left: 0; display:none;"></canvas>
+<div id="threeJsContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@18.6.4/dist/tween.umd.js"></script>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

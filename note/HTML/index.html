@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>哎呦喂</title>
+  </head>
+  <style></style>
+  <style>
+  html{
+    filter: grayscale(100%);
+  } 
+    @keyframes danmaku-move {
+      0% {
+        left: 100%;
+      }
+      100% {
+        left: -100%;
+      }
+    }
+    .danmaku {
+      position: absolute;
+      white-space: nowrap;
+      color: #fff;
+      font-size: 16px;
+      top: 0;
+      left: 100%;
+      will-change: transform;
+      pointer-events: none;
+    }
+    .card {
+      width: 400px;
+      border-radius: 20px;
+      background: linear-gradient(to bottom, #eef1f7 0%, #c3cadb 100%);
+      box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.6),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3); /* 外阴影 + 内阴影 */
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .content {
+      height: 300px;
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .con {
+      width: 100%;
+      height: 150px;
+      background-color: #c3cadb;
+      overflow: auto;
+    }
+
+    .list {
+      width: 100%;
+      height: auto;
+      overflow: hidden;
+    }
+
+    ul,
+    li {
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-box {
+      width: 1069px;
+      height: 116px;
+      background-image: url("./test-nav.png");
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-list {
+      width: 1035px;
+      height: 73px;
+      margin-bottom: 8px;
+      display: flex;
+      border: 1px solid red;
+      transform: translateX(19px);
+    }
+
+    .nav-list li:first-child {
+      width: 120px;
+    }
+
+    .nav-list li:last-child {
+      width: 190px;
+    }
+
+    .nav-list li {
+      width: 180px;
+      height: 100%;
+      border: 1px solid red;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nav-list li:first-child:hover {
+      background-image: url("./test-nav-hover.png");
+    }
+    .nav-list li:laset-child:hover {
+      background-image: url("./test-nav-hover.png");
+    }
+    .nav-list li:hover {
+      background-image: url("./test-nav-hover.png");
+    }
+  </style>
+  <body>
+    <canvas id="myCanvas" width="800" height="200"></canvas>
+
+    <svg height="100" width="500">
+      <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color: red; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: blue; stop-opacity: 1" />
+        </linearGradient>
+      </defs>
+      <text
+        fill="url(#grad1)"
+        font-size="60"
+        font-family="Verdana"
+        x="0"
+        y="70"
+      >
+        Gradient Text
+      </text>
+    </svg>
+
+    <div class="nav-box">
+      <ul class="nav-list">
+        <li>首页</li>
+        <li>不是首页</li>
+        <li>不是首页</li>
+        <li>不是首页</li>
+        <li>不是首页</li>
+        <li>不是首页更长</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="content"></div>
+    </div>
+    <input type="text" onchange="" />
+    <div>
+      <button onclick="rect()">绘制矩形</button>
+      <button onclick="circle()">绘制圆形</button>
+      <button onclick="line()">写字板</button>
+      <button onclick="eraser()">橡皮</button>
+      <button onclick="location.reload()">刷新</button>
+      <button onclick="alert('哎呦喂')">哎呦喂</button>
+      <button onclick="onclear()">清除</button>
+    </div>
+    <div>
+      <canvas id="canvas" width="1000" height="300"></canvas>
+    </div>
+
+    <div>
+      <button onclick="scrollToI()">scroll</button>
+    </div>
+    <div
+      id="list-container"
+      style="height: 500px; overflow: auto; border: 1px solid #ccc"
+    ></div>
+    <!-- 倒三角 -->
+    <div
+      style="
+        width: 0;
+        height: 0;
+        border-left: -50px solid transparent;
+        border-right: -50px solid transparent;
+        border-bottom: -100px solid red;
+      "
+    ></div>
+
+    <div
+      id="app"
+      style="
+        width: 100%;
+        position: relative;
+        height: 300px;
+        background: #000;
+        overflow: hidden;
+      "
+    ></div>
+
+    <div class="con">
+      <div class="list">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+        <div>4</div>
+        <div>5</div>
+        <div>6</div>
+        <div>7</div>
+        <div>8</div>
+        <div>9</div>
+        <div>10</div>
+      </div>
+    </div>
+
+    <canvas
+      id="textCanvas"
+      width="400"
+      height="200"
+      style="border: 1px solid #000"
+    ></canvas>
+
+    <script>
+      // canvas
+      window.onload = function () {
+        var canvas = document.getElementById("myCanvas");
+        if (canvas.getContext) {
+          var ctx = canvas.getContext("2d");
+
+          // 创建一个线性渐变
+          var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+          gradient.addColorStop(0, "magenta"); // 起始颜色
+          gradient.addColorStop(1, "blue"); // 结束颜色
+
+          // 设置字体和样式
+          ctx.font = "48px Arial";
+          ctx.fillStyle = gradient; // 应用渐变颜色到填充样式
+
+          // 绘制文本
+          ctx.fillText("渐变字体", 100, 100); // 在画布上指定位置绘制文本
+        } else {
+          console.log("Canvas not supported");
+        }
+      };
+      function wrapText(ctx, text, maxWidth) {
+        const lines = [];
+        let line = "";
+        for (let char of text) {
+          const testLine = line + char;
+          const testWidth = ctx.measureText(testLine).width;
+          if (testWidth > maxWidth && line.length > 0) {
+            lines.push(line);
+            line = char;
+          } else {
+            line = testLine;
+          }
+        }
+        lines.push(line);
+        return lines;
+      }
+
+      function drawAdaptiveText({
+        canvasId,
+        text,
+        maxWidth,
+        maxFontSize = 32,
+        minFontSize = 12,
+        lineHeightRatio = 1.2,
+        gradientColors = ["#f00", "#00f"],
+      }) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        let fontSize = maxFontSize;
+        let lines = [];
+        let lineHeight = 0;
+
+        // 自动缩小字体直到能适配高度
+        while (fontSize >= minFontSize) {
+          ctx.font = `${fontSize}px sans-serif`;
+          lines = wrapText(ctx, text, maxWidth);
+          lineHeight = fontSize * lineHeightRatio;
+          const totalHeight = lines.length * lineHeight;
+
+          // ✅ 同时满足：高度能容纳 + 每行都能放得下（wrapText 已确保）
+          if (totalHeight <= canvasHeight) break;
+
+          fontSize--;
+        }
+
+        // 设置渐变填充
+        const gradient = ctx.createLinearGradient(0, 0, canvasWidth, 0);
+        const step = 1 / (gradientColors.length - 1);
+        gradientColors.forEach((color, i) => {
+          gradient.addColorStop(i * step, color);
+        });
+
+        ctx.fillStyle = gradient;
+        ctx.textBaseline = "top";
+
+        const offsetY = (canvasHeight - lines.length * lineHeight) / 2;
+
+        lines.forEach((line, i) => {
+          ctx.fillText(line, 0, offsetY + i * lineHeight);
+        });
+
+        // 👉 提示当前字体大小
+        console.log(`Final font size used: ${fontSize}px`);
+      }
+
+      // 调用：文本太长就会自动缩小
+      drawAdaptiveText({
+        canvasId: "textCanvas",
+        text: "这是一段非常长非常长的中文文字，为了测试 canvas 是否能够自动缩小字体为了测试 canvas 是否能够自动缩小字小字体为了测试 canvas 是否能够自动缩小字小字体为了测试 canvas 是否能够自动缩小字小字体为了测试 canvas 是否能够自动缩小字小字体为了测试 canvas 是否能够自动缩小字体为了测试 canvas 是否能够自动缩小字体为了测试 canvas 是否能够自动缩小字体、换行并且添加文字渐变，我们需要用很多很多很多字。",
+        maxWidth: 380,
+        maxFontSize: 32,
+        minFontSize: 10,
+        gradientColors: ["#ff0000", "#00ff00", "#0000ff"],
+      });
+
+      function launchDanmaku(text, containerSelector = "#app", speed = 100) {
+        // const container = document.querySelector(containerSelector);
+        // if (!container) return;
+
+        // const danmaku = document.createElement("div");
+        // danmaku.className = "danmaku";
+        // danmaku.textContent = text;
+
+        // // 随机高度
+        // const top = Math.random() * (container.clientHeight - 20);
+        // danmaku.style.top = `${top}px`;
+        // danmaku.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+
+        // // 设置动画持续时间（越长越慢）
+        // const duration = speed + Math.random() * 3;
+        // danmaku.style.animationDuration = `${duration}s`;
+
+        // container.appendChild(danmaku);
+
+        // // 动画结束后自动移除
+        // danmaku.addEventListener("animationend", () => {
+        //   danmaku.remove();
+        // });
+        // 以上代码是旧的实现方式，下面是新的实现方式
+        // const container = document.querySelector(containerSelector);
+        // if (!container) return;
+
+        // const danmaku = document.createElement("div");
+        // danmaku.className = "danmaku";
+        // danmaku.textContent = text;
+
+        // // 设置随机垂直位置（避免重叠）
+        // const top = Math.random() * (container.clientHeight - 20);
+        // danmaku.style.top = `${top}px`;
+        // danmaku.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+
+        // // 先隐藏再添加以测量宽度
+        // danmaku.style.visibility = "hidden";
+        // container.appendChild(danmaku);
+
+        // // 根据自身宽度设置动画目标
+        // const width = danmaku.offsetWidth;
+        // danmaku.style.left = "100%";
+        // danmaku.style.animationDuration = `${speed + Math.random() * 3}s`;
+
+        // danmaku.style.visibility = "visible";
+
+        //以上代码是旧的实现方式，下面是新的实现方式
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        const danmaku = document.createElement("div");
+        danmaku.className = "danmaku";
+        danmaku.textContent = text;
+
+        const top = Math.random() * (container.clientHeight - 20);
+        danmaku.style.top = `${top}px`;
+        danmaku.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+
+        container.appendChild(danmaku);
+
+        // 弹幕宽度
+        const danmakuWidth = danmaku.offsetWidth;
+
+        // 初始位置
+        let x = container.clientWidth;
+        const step = () => {
+          // 是相隔的距离吗
+          if (!danmaku.parentNode) return; // 如果弹幕已被移除则停止动画
+          //位置直接从右侧开始
+          danmaku.style.left = `${x}px`;
+          // 每帧移动距离
+          x -= speed / 30; // 每帧移动距离（speed px/sec）
+
+          danmaku.style.transform = `translateX(${x}px)`;
+
+          const danmakuRight = danmaku.getBoundingClientRect().right;
+          const containerLeft = container.getBoundingClientRect().left;
+
+          if (danmakuRight < containerLeft) {
+            danmaku.remove();
+          } else {
+            requestAnimationFrame(step);
+          }
+        };
+
+        requestAnimationFrame(step);
+
+        // 动画结束后移除
+        danmaku.addEventListener("animationend", () => {
+          danmaku.remove();
+        });
+      }
+
+      // 每2秒添加一条弹幕
+      if (isD) {
+        setInterval(() => {
+          const sampleTexts = [
+            "你好啊",
+            "这是一条弹幕",
+            "CSS弹幕",
+            "🚀飞起来",
+            "🚀🚀🚀🚀",
+            "哎哟喂🚀🚀🚀🚀",
+            "弹幕测试",
+            "测试测试",
+            "你好啊",
+            "这是一条弹幕",
+            "CSS弹幕",
+            "🚀飞起来",
+            "🚀🚀🚀🚀",
+            "哎哟喂🚀🚀🚀🚀",
+            "弹幕测试",
+            "测试测试",
+            "你好啊",
+            "这是一条弹幕",
+            "CSS弹幕",
+            "🚀飞起来",
+            "🚀🚀🚀🚀",
+            "哎哟喂🚀🚀🚀🚀",
+            "弹幕测试",
+            "测试测试",
+            "你好啊",
+            "这是一条弹幕",
+            "CSS弹幕",
+            "🚀飞起来",
+            "🚀🚀🚀🚀",
+            "哎哟喂🚀🚀🚀🚀",
+            "弹幕测试",
+            "测试测试",
+            "你好啊",
+            "这是一条弹幕",
+            "CSS弹幕",
+            "🚀飞起来",
+            "🚀🚀🚀🚀",
+            "哎哟喂🚀🚀🚀🚀",
+            "弹幕测试",
+            "测试测试",
+            "你好啊",
+            "这是一条弹幕",
+            "CSS弹幕",
+            "🚀飞起来",
+            "🚀🚀🚀🚀",
+            "哎哟喂🚀🚀🚀🚀",
+            "弹幕测试",
+            "测试测试",
+            "你好啊",
+            "这是一条弹幕",
+            "CSS弹幕",
+            "🚀飞起来",
+            "🚀🚀🚀🚀",
+            "哎哟喂🚀🚀🚀🚀",
+            "弹幕测试",
+            "测试测试",
+            "你好啊",
+            "这是一条弹幕",
+            "CSS弹幕",
+            "🚀飞起来",
+            "🚀🚀🚀🚀",
+            "哎哟喂🚀🚀🚀🚀",
+            "弹幕测试",
+            "测试测试",
+          ];
+          const text =
+            sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+          launchDanmaku(text);
+        }, 800);
+      } else {
+        console.log("弹幕功能已关闭");
+      }
+    </script>
+
+    <script defer>
+      document.addEventListener("dblclick", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+
+      const isMobile = /Mobi|Android|ios/i.test(navigator.userAgent);
+
+      let canvas = document.getElementById("canvas");
+      let context = canvas.getContext("2d");
+      let currentTool = null;
+      let isDrawing = false;
+      let lastX = 0;
+      let lastY = 0;
+
+      function setCanvasSize() {
+        if (/Mobi|Android|ios/i.test(navigator.userAgent)) {
+          canvas.style.width = "100vw";
+          canvas.style.height = "30vh";
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight * 0.3;
+        } else {
+          canvas.style.width = "1000px";
+          canvas.style.height = "300px";
+          canvas.width = 1000;
+          canvas.height = 300;
+        }
+        canvas.style.background = "beige";
+      }
+      setCanvasSize();
+
+      function removeAllListeners() {
+        const clone = canvas.cloneNode(true); // 克隆 canvas，自动去除所有绑定事件
+        canvas.parentNode.replaceChild(clone, canvas); // 替换原 canvas
+        // 重新获取 context 和重新绑定大小样式
+        clone.style.background = "beige";
+        clone.style.width = canvas.style.width;
+        clone.style.height = canvas.style.height;
+        clone.width = canvas.width;
+        clone.height = canvas.height;
+        context = clone.getContext("2d");
+        canvas = clone;
+      }
+
+      // 获取事件坐标（支持 mouse / touch）
+      function getEventPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        if (e.touches && e.touches.length > 0) {
+          return {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top,
+          };
+        } else {
+          return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+          };
+        }
+      }
+
+      function resetCanvasEvents() {
+        canvas.onmousedown = null;
+        canvas.onmousemove = null;
+        canvas.onmouseup = null;
+        canvas.onmouseout = null;
+
+        canvas.ontouchstart = null;
+        canvas.ontouchmove = null;
+        canvas.ontouchend = null;
+        canvas.ontouchcancel = null;
+
+        canvas.style.cursor = "default";
+        isDrawing = false;
+      }
+
+      function onclear() {
+        alert("哎呦喂,清除呢");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function eraser() {
+        alert("哎呦喂,橡皮擦呢");
+        alert("哎呦喂,请按住鼠标或手指擦除哦");
+        alert("哎呦喂,橡皮大小20px哦");
+
+        let isErasing = false;
+
+        canvas.style.cursor =
+          'url("https://cdn-icons-png.flaticon.com/512/1250/1250615.png"), auto';
+        canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+
+        if (currentTool === "eraser") return;
+        currentTool = "eraser";
+        resetCanvasEvents();
+
+        canvas.style.cursor = "crosshair";
+
+        // 鼠标支持
+        canvas.addEventListener("mousedown", (e) => {
+          isDrawing = true;
+          const { x, y } = getEventPos(e);
+          context.globalCompositeOperation = "destination-out";
+          context.beginPath();
+          context.moveTo(x, y);
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+          if (!isDrawing) return;
+          const { x, y } = getEventPos(e);
+          context.lineTo(x, y);
+          context.lineWidth = 20;
+          context.stroke();
+        });
+
+        canvas.addEventListener("mouseup", () => {
+          isDrawing = false;
+          context.globalCompositeOperation = "source-over";
+        });
+
+        canvas.addEventListener("mouseout", () => {
+          isDrawing = false;
+          context.globalCompositeOperation = "source-over";
+        });
+
+        // 触摸支持
+        canvas.addEventListener(
+          "touchstart",
+          (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            const { x, y } = getEventPos(e);
+            context.globalCompositeOperation = "destination-out";
+            context.beginPath();
+            context.moveTo(x, y);
+          },
+          { passive: false }
+        );
+
+        canvas.addEventListener(
+          "touchmove",
+          (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const { x, y } = getEventPos(e);
+            context.lineTo(x, y);
+            context.lineWidth = 20;
+            context.stroke();
+          },
+          { passive: false }
+        );
+
+        canvas.addEventListener("touchend", () => {
+          isDrawing = false;
+          context.globalCompositeOperation = "source-over";
+        });
+
+        canvas.addEventListener("touchcancel", () => {
+          isDrawing = false;
+          context.globalCompositeOperation = "source-over";
+        });
+      }
+
+      function randeColor() {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+
+      function randeAxis() {
+        const width = Math.floor(Math.random() * canvas.width * 0.5) + 1;
+        const height = Math.floor(Math.random() * canvas.height * 0.5) + 1;
+        return {
+          w: width,
+          h: height,
+          x: Math.floor(Math.random() * (canvas.width - width)),
+          y: Math.floor(Math.random() * (canvas.height - height)),
+        };
+      }
+
+      function rect() {
+        const { w, h, x, y } = randeAxis();
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = randeColor();
+        context.fillRect(x, y, w, h);
+      }
+
+      function circle() {
+        const { w, h, x, y } = randeAxis();
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = randeColor();
+        context.beginPath();
+        context.arc(x + w / 2, y + h / 2, Math.min(w, h) / 2, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      function line() {
+        if (currentTool === "line") return; // 防止重复切换
+        currentTool = "line";
+
+        canvas.style.cursor = "crosshair";
+
+        // 先移除旧监听
+        removeAllListeners();
+
+        canvas.addEventListener("mousedown", (e) => {
+          isDrawing = true;
+          const { x, y } = getEventPos(e);
+          lastX = x;
+          lastY = y;
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+          if (!isDrawing) return;
+          const { x, y } = getEventPos(e);
+          context.beginPath();
+          context.moveTo(lastX, lastY);
+          context.lineTo(x, y);
+          context.strokeStyle = "#000";
+          context.lineWidth = 2;
+          context.stroke();
+          lastX = x;
+          lastY = y;
+        });
+
+        canvas.addEventListener("mouseup", () => {
+          isDrawing = false;
+        });
+
+        canvas.addEventListener("mouseout", () => {
+          isDrawing = false;
+        });
+
+        // 触控事件
+        canvas.addEventListener(
+          "touchstart",
+          (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            const { x, y } = getEventPos(e);
+            lastX = x;
+            lastY = y;
+          },
+          { passive: false }
+        );
+
+        canvas.addEventListener(
+          "touchmove",
+          (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const { x, y } = getEventPos(e);
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineTo(x, y);
+            context.strokeStyle = "#000";
+            context.lineWidth = 2;
+            context.stroke();
+            lastX = x;
+            lastY = y;
+          },
+          { passive: false }
+        );
+
+        canvas.addEventListener("touchend", () => {
+          isDrawing = false;
+        });
+
+        canvas.addEventListener("touchcancel", () => {
+          isDrawing = false;
+        });
+      }
+    </script>
+
+    <!-- <script >
+      //
+      const arr1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+      // 数组的解构赋值
+      const [b, c, ...rest] = arr1;
+      console.log(b, c, rest); // 1 2 3 [4, 5, 6, 7, 8, 9, 10]
+
+      // 数组的方法
+      const arr2 = arr1.map((item) => item * 2); // map：将每个元素乘以2  不会修改原数组
+      console.log(arr2); // [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+      const arr3 = arr1.filter((item) => item % 2 === 0); // filter：筛选出偶数 不会修改原数组
+      console.log(arr3); // [2, 4, 6, 8, 10]
+      const arr4 = arr1.reduce((acc, item) => acc + item, 0); // reduce：计算数组元素的总和 不会修改原数组
+      console.log(arr4); // 55
+      const arr5 = arr1.find((item) => item > 5); // find：找到第一个大于5的元素 不会修改原数组
+      console.log(arr5); // 6
+      const arr6 = arr1.findIndex((item) => item > 5); // findIndex：找到第一个大于5的元素的索引 不会修改原数组
+      console.log(arr6); // 5
+      const arr7 = arr1.includes(5); // includes：检查数组是否包含5 不会修改原数组
+      console.log(arr7); // true
+      const arr8 = arr1.indexOf(5); // indexOf：找到5的索引 不会修改原数组
+      console.log(arr8); // 4
+      const arr9 = arr1.slice(2, 5); // slice：截取从索引2到索引5的元素 不会修改原数组
+      console.log(arr9); // [3, 4, 5]
+      const arr10 = arr1.splice(2, 3); // splice：从索引2开始删除3个元素 并返回被删除的元素 会修改原数组
+      console.log(arr10); // [3, 4, 5]
+      console.log(arr1); // [1, 2, 6, 7, 8, 9, 10]
+      const arr11 = arr1.concat(arr2); // concat：将两个数组合并 不会修改原数组
+      console.log(arr11); // [1, 2, 6, 7, 8, 9, 10, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+      const arr12 = arr1.join("-"); // join：将数组元素连接成一个字符串 使用"-"作为分隔符 不会修改原数组
+      console.log(arr12); // "1-2-6-7-8-9-10"
+      const arr13 = arr1.reverse(); // reverse：反转数组元素 会修改原数组
+      console.log(arr13); // [10, 9, 8, 7, 6, 2, 1]
+      const arr14 = arr1.sort((a, b) => a - b); // sort：对数组元素进行排序 会修改原数组
+      console.log(arr14); // [1, 2, 6, 7, 8, 9, 10]
+      const arr15 = arr1.toString(); // toString：将数组转换为字符串 不会修改原数组
+      console.log(arr15); // "1,2,6,7,8,9,10"
+      const arr16 = arr1.toLocaleString(); // toLocaleString：将数组转换为本地化的字符串 不会修改原数组
+      console.log(arr16); // "1,2,6,7,8,9,10"
+      const arr17 = arr1.fill(0, 2, 5); // 从索引2到索引5填充0 会修改原数组
+      console.log(arr17); // [1, 2, 0, 0, 0, 9, 10]
+      const arr18 = arr1.copyWithin(2, 0, 2); // 从索引0开始复制到索引2的元素到索引2开始的位置 会修改原数组
+      console.log(arr18); // [1, 2, 1, 2, 0, 9, 10]
+      const arr19 = arr1.flat(); // flat：将多维数组扁平化 不会修改原数组
+      console.log(arr19); // [1, 2, 1, 2, 0, 9, 10]
+      const arr20 = arr1.flatMap((item) => [item, item * 2]); // flatMap：先映射每个元素，然后扁平化 不会修改原数组
+      console.log(arr20); // [1, 2, 1, 2, 0, 9, 10, 0, 18, 20]
+      const arr21 = arr1.findLast((item) => item > 5); // findLast：找到最后一个大于5的元素 不会修改原数组
+      console.log(arr21); // 10
+      const arr22 = arr1.findLastIndex((item) => item > 5); // findLastIndex：找到最后一个大于5的元素的索引 不会修改原数组
+      console.log(arr22); // 6
+      const arr23 = arr1.at(2); // at：获取索引2的元素 不会修改原数组
+      console.log(arr23); // 1
+      const arr24 = arr1.toReversed(); // toReversed：返回一个新数组，元素顺序与原数组相反 不会修改原数组
+      console.log(arr24); // [10, 9, 8, 7, 6, 2, 1]
+      const arr25 = arr1.toSorted((a, b) => a - b); // toSorted：返回一个新的排序后的数组 不会修改原数组
+      console.log(arr25); // [1, 2, 6, 7, 8, 9, 10]
+      const arr26 = arr1.toSpliced(2, 3, 100, 200); // toSpliced：返回一个新的数组，删除索引2开始的3个元素，并添加100和200 不会修改原数组
+      console.log(arr26); // [1, 2, 100, 200, 9, 10]
+
+      // 对象的解构赋值
+      const obj = {
+        name: "哎呦喂",
+        age: 18,
+        address: "中国",
+      };
+      const { name, age, ...restObj } = obj;
+      console.log(name, age, restObj); // 哎呦喂 18 { address: '中国' }
+
+      // 对象的方法
+      const obj2 = { ...obj }; // 扩展运算符：创建一个新的对象，包含obj的所有属性 浅拷贝
+      console.log(obj2); // { name: '哎呦喂', age: 18, address: '中国' }
+      const obj3 = Object.assign({}, obj); // Object.assign：将obj的属性复制到一个新对象中 浅拷贝
+      console.log(obj3); // { name: '哎呦喂', age: 18, address: '中国' }
+      const obj4 = Object.keys(obj); // Object.keys：获取对象的所有键 返回一个数组
+      console.log(obj4); // [ 'name', 'age', 'address' ]
+      const obj5 = Object.values(obj); // Object.values：获取对象的所有值 返回一个数组
+      console.log(obj5); // [ '哎呦喂', 18, '中国' ]
+      const obj6 = Object.entries(obj); // Object.entries：获取对象的键值对 返回一个二维数组
+      console.log(obj6); // [ [ 'name', '哎呦喂' ], [ 'age', 18 ], [ 'address', '中国' ] ]
+      const obj7 = Object.fromEntries(obj6); // Object.fromEntries：将键值对数组转换为对象
+      console.log(obj7); // { name: '哎呦喂', age: 18, address: '中国' }
+      const obj8 = Object.freeze(obj); // Object.freeze：冻结对象，禁止修改
+      console.log(obj8); // { name: '哎呦喂', age: 18, address: '中国' }
+      const obj9 = Object.seal(obj); // Object.seal：密封对象，禁止添加或删除属性，但可以修改现有属性
+      console.log(obj9); // { name: '哎呦喂', age: 18, address: '中国' }
+      const obj10 = Object.getOwnPropertyNames(obj); // 获取对象的所有属性名 返回一个数组
+      console.log(obj10); // [ 'name', 'age', 'address' ]
+      const obj11 = Object.getOwnPropertySymbols(obj); // 获取对象的所有符号属性 返回一个数组
+      console.log(obj11); // []
+      const obj12 = Object.hasOwn(obj, "name"); // 检查对象是否具有指定属性 返回布尔值
+      console.log(obj12); // true
+      const obj13 = Object.is(obj, obj2); // 检查两个对象是否相同 返回布尔值
+      console.log(obj13); // false
+      const obj14 = Object.isExtensible(obj); // 检查对象是否可扩展 返回布尔值
+      console.log(obj14); // true
+      const obj15 = Object.isSealed(obj); // 检查对象是否被密封 返回布尔值
+      console.log(obj15); // false
+      const obj16 = Object.isFrozen(obj); // 检查对象是否被冻结 返回布尔值
+      console.log(obj16); // false
+      const obj17 = Object.getPrototypeOf(obj); // 获取对象的原型 返回一个对象
+      console.log(obj17); // {}
+      // const obj18 = Object.setPrototypeOf(obj, {}); // 设置对象的原型 返回新的对象
+      // console.log(obj18); // { name: '哎呦喂', age: 18, address: '中国' }
+      const obj19 = Object.create(obj); // 创建一个新对象，原型为obj 返回一个新对象
+      console.log(obj19); // {}
+
+      // 跨域问题及解决方案
+      // 跨域问题：浏览器的同源策略限制了不同源之间的资源共享
+      // 解决方案：
+      // 1. CORS（跨源资源共享）：服务器在响应头中添加Access-Control-Allow-Origin等字段，允许特定源访问资源
+      // 2. JSONP：通过<script>标签加载数据，利用回调函数实现跨域
+      // 3. 代理服务器：通过设置代理服务器，将请求转发到目标服务器，绕过同源限制
+      // 4. WebSocket：WebSocket协议不受同源限制，可以实现跨域通信
+      // 5. iframe：通过在iframe中加载不同源的页面，实现跨域通信
+      // 6. postMessage：通过window.postMessage方法实现跨域通信
+      // 7. 使用服务端代理：通过服务端转发请求，绕过浏览器的同源限制
+      // 8. 使用浏览器插件：一些浏览器插件可以绕过同源限制
+      // 9. 使用document.domain：在同一主域下的不同子域之间可以通过设置document.domain实现跨域通信
+      // 10. 使用window.name：通过window.name属性可以实现跨域通信
+      // 11. 使用URL.hash：通过修改URL的hash部分实现跨域通信
+      // 12. 使用WebRTC：WebRTC可以实现点对点的跨域通信
+      // 13. 使用Service Worker：Service Worker可以拦截请求，实现跨域资源共享
+      // 14. 使用Fetch API：Fetch API支持CORS，可以通过设置请求头实现跨域请求
+      // 15. 使用XMLHttpRequest：XMLHttpRequest支持CORS，可以通过设置请求头实现跨域请求
+      // 16. 使用iframe的sandbox属性：通过设置sandbox属性，可以限制iframe的权限，实现跨域通信
+      // 17. 使用window.location.href：通过修改window.location.href实现跨域跳转
+      // 18. 使用window.open：通过window.open方法打开新窗口，实现跨域跳转
+
+      // 盒模型
+      // 盒模型是指浏览器渲染元素时的模型，包括内容(content)、内边距(padding)、边框(border)和外边距(margin)
+      // 1. content：元素的实际内容区域
+      // 2. padding：元素内容与边框之间的空间
+      // 3. border：元素的边框
+      // 4. margin：元素与其他元素之间的空间
+      // 盒模型的计算方式：
+      // 1. 标准盒模型（W3C盒模型）：width和height只包括content区域，不包括padding、border和margin
+      // 2. IE盒模型：width和height包括content、padding和border，不包括margin
+      // 盒模型的设置方式：
+      // 1. 使用CSS的box-sizing属性设置盒模型类型
+      //    - box-sizing: content-box; // 标准盒模型
+      //    - box-sizing: border-box; // IE盒模型
+      // 2. 使用CSS的width、height、padding、border和margin属性设置盒模型的各个部分
+      // 3. 使用CSS的calc()函数计算盒模型的宽高
+      // 4. 使用CSS的rem、em、px等单位设置盒模型的宽高
+      // 5. 使用CSS的flexbox和grid布局设置盒模型的宽高
+      // 6. 使用CSS的媒体查询根据屏幕大小调整盒模型的宽高
+      // 7. 使用CSS的transform属性对盒模型进行变换
+      // 8. 使用CSS的transition和animation属性对盒模型进行动画效果
+      // 9. 使用CSS的overflow属性控制盒模型的溢出行为
+      // 10. 使用CSS的position属性设置盒模型的位置
+      // 11. 使用CSS的display属性设置盒模型的显示方式
+      // 12. 使用CSS的float属性设置盒模型的浮动行为
+      // 13. 使用CSS的clear属性清除浮动
+      // 14. 使用CSS的z-index属性设置盒模型的堆叠顺序
+      // 15. 使用CSS的visibility属性控制盒模型的可见性
+      // 16. 使用CSS的opacity属性设置盒模型的透明度
+      // 17. 使用CSS的background属性设置盒模型的背景
+      // 18. 使用CSS的border-radius属性设置盒模型的圆角
+      // 19. 使用CSS的box-shadow属性设置盒模型的阴影效果
+      // 20. 使用CSS的text-shadow属性设置盒模型中文字的阴影效果
+      // 21. 使用CSS的transform-origin属性设置盒模型的变换原点
+      // 22. 使用CSS的will-change属性提示浏览器优化盒模型的渲染
+      // 23. 使用CSS的contain属性限制盒模型的渲染范围
+      // 24. 使用CSS的filter属性对盒模型应用滤镜效果
+      // 25. 使用CSS的clip-path属性裁剪盒模型
+      // 26. 使用CSS的mask属性对盒模型应用遮罩效果
+      // 27. 使用CSS的grid-template-columns和grid-template-rows属性设置网格布局的列和行
+      // 28. 使用CSS的flex-direction、flex-wrap和align-items属性设置弹性盒布局的方向、换行和对齐方式
+      // 29. 使用CSS的justify-content和align-content属性设置弹性盒布局的主轴和交叉轴对齐方式
+      // 30. 使用CSS的grid-area属性设置网格布局的区域
+      // 31. 使用CSS的grid-gap属性设置网格布局的间距
+      // 32. 使用CSS的flex-grow、flex-shrink和flex-basis属性设置弹性盒布局的伸缩行为
+      // 33. 使用CSS的grid-template-areas属性设置网格布局的区域名称
+      // 34. 使用CSS的flex-flow属性简写弹性盒布局的方向和换行
+      // 35. 使用CSS的grid-auto-columns和grid-auto-rows属性设置自动列和行的大小
+      // 36. 使用CSS的flexbox和grid布局的嵌套实现复杂布局
+      // 37. 使用CSS的aspect-ratio属性设置盒模型的宽高比
+      // 38. 使用CSS的object-fit和object-position属性设置盒模型内嵌元素的适应方式
+      // 39. 使用CSS的scroll-snap属性实现滚动捕捉效果
+      // 40. 使用CSS的overflow-x和overflow-y属性分别控制水平和垂直方向的溢出行为
+      // 41. 使用CSS的resize属性允许用户调整盒模型的大小
+      // 42. 使用CSS的pointer-events属性控制盒模型的鼠标事件响应
+      // 43. 使用CSS的user-select属性控制盒模型中文字的选择行为
+      // 44. 使用CSS的text-overflow属性控制盒模型中文字的溢出行为
+      // 45. 使用CSS的white-space属性控制盒模型中文字的换行行为
+      // 46. 使用CSS的line-height属性设置盒模型中文字的行高
+      // 47. 使用CSS的text-align属性设置盒模型中文字的对齐方式
+      // 48. 使用CSS的font-size、font-family和font-weight属性设置盒模型中文字的字体样式
+      // 49. 使用CSS的text-decoration属性设置盒模型中文字的装饰效果
+      // 50. 使用CSS的text-transform属性设置盒模型中文字的大小写转换
+
+      const a = void 0;
+      console.log(a ?? 1); // ??：只能在a为undefined或null时使用
+
+      sessionStorage.setItem("val", "12321312");
+      console.log(sessionStorage.getItem("val")); // 刷新后依然存在
+    </script> -->
+
+    <script>
+      function VirtualList({
+        container,
+        itemCount,
+        estimatedHeight,
+        renderItem,
+      }) {
+        const itemHeights = new Array(itemCount).fill(estimatedHeight);
+        const itemOffsets = new Array(itemCount);
+        const visibleNodes = [];
+        const buffer = 5;
+
+        const inner = document.createElement("div");
+        inner.style.position = "relative";
+        inner.style.width = "100%";
+        container.appendChild(inner);
+
+        calculateOffsets();
+        inner.style.height =
+          itemOffsets[itemCount - 1] + itemHeights[itemCount - 1] + "px";
+
+        const visibleCount = Math.ceil(
+          container.clientHeight / estimatedHeight
+        );
+        const renderCount = visibleCount + buffer * 2;
+
+        for (let i = 0; i < renderCount; i++) {
+          const el = document.createElement("div");
+          el.style.position = "absolute";
+          el.style.width = "100%";
+          el.style.willChange = "transform";
+          inner.appendChild(el);
+          visibleNodes.push(el);
+        }
+
+        function calculateOffsets() {
+          let offset = 0;
+          for (let i = 0; i < itemCount; i++) {
+            itemOffsets[i] = offset;
+            offset += itemHeights[i];
+          }
+        }
+
+        function render() {
+          const scrollTop = container.scrollTop;
+          const startIndex = findStartIndex(scrollTop);
+          const endIndex = Math.min(itemCount - 1, startIndex + renderCount);
+
+          for (let i = 0; i < renderCount && startIndex + i < itemCount; i++) {
+            const index = startIndex + i;
+            const node = visibleNodes[i];
+            node.style.transform = `translateY(${itemOffsets[index]}px)`;
+            const content = renderItem(index);
+            if (typeof content === "string") {
+              node.innerHTML = content;
+            } else {
+              node.innerHTML = "";
+              node.appendChild(content);
+            }
+          }
+        }
+
+        function findStartIndex(scrollTop) {
+          let low = 0,
+            high = itemCount - 1;
+          while (low <= high) {
+            const mid = Math.floor((low + high) / 2);
+            if (itemOffsets[mid] < scrollTop) {
+              low = mid + 1;
+            } else {
+              high = mid - 1;
+            }
+          }
+          return Math.max(0, low - buffer);
+        }
+
+        function scrollToIndex(index) {
+          if (index < 0 || index >= itemCount) return;
+          const offset = itemOffsets[index];
+          container.scrollTo({
+            top: offset,
+            behavior: "smooth",
+          });
+        }
+
+        function updateItemHeight(index, newHeight) {
+          if (itemHeights[index] !== newHeight) {
+            itemHeights[index] = newHeight;
+            calculateOffsets();
+            inner.style.height =
+              itemOffsets[itemCount - 1] + itemHeights[itemCount - 1] + "px";
+            render();
+          }
+        }
+
+        container.addEventListener("scroll", () =>
+          requestAnimationFrame(render)
+        );
+        render();
+
+        return {
+          scrollToIndex,
+          updateItemHeight,
+        };
+      }
+
+      // ✅ 使用
+      const total = 10000;
+      const container = document.getElementById("list-container");
+
+      const list = VirtualList({
+        container,
+        itemCount: total,
+        estimatedHeight: 40,
+        renderItem(index) {
+          const el = document.createElement("div");
+          el.className = "item";
+          const height = 30 + Math.floor(Math.random() * 50);
+          el.style.height = height + "px";
+          el.textContent = `第 ${index} 项，高度：${height}px`;
+
+          return el;
+        },
+      });
+
+      function scrollToI() {
+        list.scrollToIndex(Math.floor(Math.random() * total));
+      }
+    </script>
+  </body>
+</html>
